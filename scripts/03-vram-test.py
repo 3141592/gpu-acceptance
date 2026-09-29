@@ -65,6 +65,51 @@ for pattern in patterns:
             f"{errors} incorrect elements"
         )
 
+print("\nWriting address-dependent pattern...")
+
+chunk_elements = 16 * 1024 * 1024
+
+for start in range(0, elements, chunk_elements):
+    end = min(start + chunk_elements, elements)
+
+    values = torch.arange(
+        start,
+        end,
+        dtype=torch.int64,
+        device=device,
+    )
+
+    data[start:end] = values.to(torch.int32)
+
+torch.cuda.synchronize()
+
+print("Verifying address-dependent pattern...")
+
+errors = 0
+
+for start in range(0, elements, chunk_elements):
+    end = min(start + chunk_elements, elements)
+
+    expected = torch.arange(
+        start,
+        end,
+        dtype=torch.int64,
+        device=device,
+    ).to(torch.int32)
+
+    errors += torch.count_nonzero(
+        data[start:end] != expected
+    ).item()
+
+torch.cuda.synchronize()
+
+print(f"Errors: {errors}")
+
+if errors:
+    raise RuntimeError(
+        f"VRAM address-dependent pattern failed with {errors} errors"
+    )
+
 del data
 torch.cuda.empty_cache()
 
