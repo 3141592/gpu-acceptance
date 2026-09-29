@@ -23,7 +23,18 @@ echo "Test:    $TEST"
 echo "Results: $OUTPUT"
 echo
 
-"$TEST" 2>&1 | tee "$OUTPUT"
+case "$TEST" in
+    *.py)
+        python "$TEST" 2>&1 | tee "$OUTPUT"
+        ;;
+    *.sh)
+        "$TEST" 2>&1 | tee "$OUTPUT"
+        ;;
+    *)
+        echo "Unsupported test type: $TEST"
+        exit 1
+        ;;
+esac
 
 echo
 echo "Results saved to: $OUTPUT"
