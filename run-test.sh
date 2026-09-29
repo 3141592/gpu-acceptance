@@ -10,6 +10,9 @@ CONFIG="$1"
 TEST="$2"
 
 source "$CONFIG"
+export GPU_LABEL
+export VRAM_FRACTION
+export STRESS_SECONDS
 
 RUN_ID="${GPU_LABEL}-$(date +%Y%m%d-%H%M%S)"
 RESULT_DIR="results/${RUN_ID}"
